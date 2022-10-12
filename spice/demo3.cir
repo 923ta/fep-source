@@ -1,0 +1,54 @@
+DEMO CIRCUIT
+* 関数g(φ)がφ^2 抵抗の単位は100k(作図時は1M) コンデンサの単位は100n(作図時は1μ)
+
+.global vcc vee
+vcc vcc 0 5
+vee vee 0 -5
+
+.ic v(1)=0 v(2)=0 v(4)=3 v(5)=-3 v(7)=0v
+
+x1 10 1 intAmp
+x2 3 4 intAmp
+x3 6 7 intAmp
+x4 1 2 invAmp
+x5 4 5 invAmp
+
+v1 8 0 1
+v2 0 9 2
+* v1 3 0 pulse(0 1 10m 100n 100n 10m 40m)
+
+r1 1 10 100k ;1/Σu
+r2 5 6 100k
+r3 7 3 100k
+r4 7 6 100k ;1/Σp
+r5 8 6 33k ;1/vp
+r6 9 10 100k
+r7 2 3 r='50000 / v(4)' ;1/g'
+r8 8 10 r='100000 / v(4) / v(4)' ;1/g
+
+* 積分器
+.subckt intAmp in out
+.ic v(1)=0v v(out)=0v
+r1 in 1 100k
+c1 1 out 100n
+b1 out 0 v='v(vcc) * (tanh(100 * (v(0) - v(1))))'
+.ends intAmp
+
+* 反転増幅器
+.subckt invAmp in out
+.ic v(1)=0v v(out)=0v
+r1 in 1 100k
+r2 1 out 100k
+b1 out 0 v='v(0) - v(in)'
+.ends invAmp
+
+.control
+tran 100u 500m
+plot v(4) v(1) v(7)
+* plot v(4) ;φ
+* plot v(1) ;εu
+* plot v(7) ;εp
+.endc
+
+.end
+

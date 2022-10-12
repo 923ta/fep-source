@@ -1,0 +1,55 @@
+test
+.include 'LMC6482A.LIB'
+
+.global vcc vee
+vcc vcc 0 5
+vee vee 0 -5
+
+v1 in 0 pulse(0 1 10m 10u 10u 10m 40m)
+x1 in out invAmp
+
+
+* * 積分器
+* .subckt intAmp in out
+* .ic v(1)=0v v(out)=0v
+* r1 in 1 100k
+* c1 1 out 100n
+* b1 out 0 v='v(vcc) * tanh(100 * (v(0) - v(1)))'
+* .ends intAmp
+
+* * 反転増幅器
+* .subckt invAmp in out
+* .ic v(1)=0v v(out)=0v
+* r1 in 1 100k
+* r2 1 out 100k
+* b1 out 0 v='v(0) - v(in)'
+* .ends invAmp
+
+* .subckt intAmp in out
+* .ic v(1)=0v v(out)=0v
+* r1 in 1 100k
+* c1 1 out 100n
+* x1 0 1 vcc vee out LMC6482A/NS ; IN+ IN- VCC VEE OUT
+* .ends intAmp
+
+* 反転増幅器
+.subckt invAmp in out
+.ic v(1)=0v v(out)=0v
+r1 in 1 100k
+r2 1 out 100k
+x1 0 1 vcc vee out LMC6482A/NS
+.ends invAmp
+
+* * 反転増幅器
+* .subckt invAmp in out
+* .ic v(1)=0v v(out)=0v
+* r1 in 1 100k
+* r2 1 out 100k
+* b1 out 0 v='v(0) - v(in)'
+* .ends invAmp
+
+.control
+tran 1u 250m
+plot v(in) v(out)
+.endc
+.end

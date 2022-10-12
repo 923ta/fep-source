@@ -1,0 +1,54 @@
+DEMO CIRCUIT ;関数g(φ)が4φ ;抵抗の単位は100k(作図時は1M) ;コンデンサの単位は100n(作図時は1μ)
+
+.include 'LMC6482A.LIB'
+
+.global vcc vee
+vcc vcc 0 5
+vee vee 0 -5
+
+.ic v(1)=0v
+.ic v(4)=3v
+.ic v(7)=0v
+
+x1 10 1 intAmp
+x2 3 4 intAmp
+x3 6 7 intAmp
+x4 1 2 invAmp
+x5 4 5 invAmp
+
+v1 8 0 1
+v2 0 9 2
+
+r1 1 10 100k ;1/Σu
+r2 5 6 100k
+r3 7 3 100k
+r4 7 6 100k ;1/Σp
+r5 8 6 33k ;1/vp
+r6 9 10 100k
+r7 2 3 25k ;1/g'
+r8 8 10 r='25000/v(4)' ;1/g
+
+* 積分器
+.subckt intAmp in out
+.ic v(1)=0v v(out)=0v
+r1 in 1 100k
+c1 1 out 100n
+x1 0 1 vcc vee out LMC6482A/NS ; IN+ IN- VCC VEE OUT
+.ends intAmp
+
+* 反転増幅器
+.subckt invAmp in out
+.ic v(1)=0v v(out)=0v
+r1 in 1 100k
+r2 1 out 100k
+x1 0 1 vcc vee out LMC6482A/NS ; IN+ IN- VCC VEE OUT
+.ends invAmp
+
+.control
+tran 100u 2000m
+plot v(4) ;φ
+plot v(1) ;εu
+plot v(7) ;εp
+.endc
+
+.end
