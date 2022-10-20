@@ -1,0 +1,4 @@
+DEMO current-mode
+
+.global vdd vss
+vdd vcc 0 
